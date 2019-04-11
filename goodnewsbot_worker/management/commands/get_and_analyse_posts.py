@@ -117,9 +117,9 @@ class Command(BaseCommand):
                         f'[{timezone.now()}] ERROR Analysing sentiment of {post.post_title}'
                     )
 
-                if response.get('Sentiment') == "POSITIVE":
+                if response.get("SentimentScore").get('Positive') > 0.7:
                     positive_posts.append(post)
-                elif response.get("Sentiment") == "NEGATIVE":
+                elif response.get("SentimentScore").get('Negative') > 0.7:
                     negative_posts.append(post)
 
             if positive_posts:
