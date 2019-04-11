@@ -125,9 +125,13 @@ class Command(BaseCommand):
             if positive_posts:
                 self.stdout.write(f'[{timezone.now()}] Found {len(positive_posts)} Positive posts!')
                 for post in positive_posts:
+
+                    post.posted_to = NewsPost.SUBREDDIT_POSTED_TO.justgoodnews
+                    post.save()
+
                     reddit_post = (
                         reddit
-                        .subreddit(settings.subreddit_to_write_good)
+                        .subreddit(settings.SUBREDDIT_TO_WRITE_GOOD)
                         .submit(
                             title=post.post_title,
                             url=post.post_url,
@@ -143,9 +147,13 @@ class Command(BaseCommand):
             if negative_posts:
                 self.stdout.write(f'[{timezone.now()}] Found {len(negative_posts)} Negative posts!')
                 for post in negative_posts:
+
+                    post.posted_to = NewsPost.SUBREDDIT_POSTED_TO.justbadnews
+                    post.save()
+
                     reddit_post = (
                         reddit
-                        .subreddit(settings.subreddit_to_write_bad)
+                        .subreddit(settings.SUBREDDIT_TO_WRITE_BAD)
                         .submit(
                             title=post.post_title,
                             url=post.post_url,
