@@ -24,18 +24,18 @@ class Command(BaseCommand):
                 2>&1
     """
     help = (
-        'Sends a summary email detailing overdue'
-        ' `InstructionReminder`s.'
+        "Sends a summary email detailing overdue"
+        " `InstructionReminder`s."
     )
 
     def handle(self, **options):
         to_read = SubredditsToRead.get_active.all()
 
-        to_read_list = to_read.values_list('subreddit_name', flat=True)
+        to_read_list = to_read.values_list("subreddit_name", flat=True)
         to_read_list = nat_join(to_read_list)
 
         self.stdout.write(
-            f'[{timezone.now()}] Fetching Reddit Posts from {to_read_list}.',
+            f"[{timezone.now()}] Fetching Reddit Posts from {to_read_list}.",
         )
 
         reddit = praw.Reddit()
@@ -84,16 +84,16 @@ class Command(BaseCommand):
 
         if not len(new_posts):
             self.stdout.write(
-                f'[{timezone.now()}] No New Posts Found! exiting.',
+                f"[{timezone.now()}] No New Posts Found! exiting.",
             )
             return
         else:
             self.stdout.write(
-                f'[{timezone.now()}] Analysing sentiment of {len(new_posts)} '
-                f'new posts.',
+                f"[{timezone.now()}] Analysing sentiment of {len(new_posts)} "
+                f"new posts.",
             )
 
-            aws_client = boto3.client('comprehend')
+            aws_client = boto3.client("comprehend")
             positive_posts = []
             negative_posts = []
 
@@ -101,28 +101,36 @@ class Command(BaseCommand):
 
                 response = aws_client.detect_sentiment(
                     Text=post.post_title,
-                    LanguageCode='en',
+                    LanguageCode="en",
                 )
 
-                if response.get('ResponseMetadata').get('HTTPStatusCode') == 200:
-                    post.analysed_sentiment = response.get('Sentiment')
-                    post.quantified_positive = response.get("SentimentScore").get('Positive')
-                    post.quantified_negative = response.get("SentimentScore").get('Negative')
-                    post.quantified_neutral = response.get("SentimentScore").get('Neutral')
-                    post.quantified_mixed = response.get("SentimentScore").get('Mixed')
+                response_metadata = response.get("ResponseMetadata")
+                if response_metadata.get("HTTPStatusCode") == 200:
+
+                    sentiment_score = response.get("SentimentScore")
+                    post.analysed_sentiment = response.get("Sentiment")
+                    post.quantified_positive = sentiment_score.get("Positive")
+                    post.quantified_negative = sentiment_score.get("Negative")
+                    post.quantified_neutral = sentiment_score.get("Neutral")
+                    post.quantified_mixed = sentiment_score.get("Mixed")
                     post.save()
+
+                    if sentiment_score.get("Positive") > 0.7:
+                        positive_posts.append(post)
+                    elif sentiment_score.get("Negative") > 0.7:
+                        negative_posts.append(post)
+
                 else:
                     self.stdout.write(
-                        f'[{timezone.now()}] ERROR Analysing sentiment of {post.post_title}'
+                        f"[{timezone.now()}] ERROR Analysing sentiment of "
+                        f"{post.post_title}"
                     )
 
-                if response.get("SentimentScore").get('Positive') > 0.7:
-                    positive_posts.append(post)
-                elif response.get("SentimentScore").get('Negative') > 0.7:
-                    negative_posts.append(post)
-
             if positive_posts:
-                self.stdout.write(f'[{timezone.now()}] Found {len(positive_posts)} Positive posts!')
+                self.stdout.write(
+                    f"[{timezone.now()}] Found {len(positive_posts)} "
+                    f"Positive posts!",
+                )
                 for post in positive_posts:
 
                     post.posted_to = NewsPost.SUBREDDIT_POSTED_TO.justgoodnews
@@ -144,7 +152,10 @@ class Command(BaseCommand):
                     time.sleep(1)
 
             if negative_posts:
-                self.stdout.write(f'[{timezone.now()}] Found {len(negative_posts)} Negative posts!')
+                self.stdout.write(
+                    f"[{timezone.now()}] Found {len(negative_posts)} "
+                    f"Negative posts!",
+                )
                 for post in negative_posts:
 
                     post.posted_to = NewsPost.SUBREDDIT_POSTED_TO.justbadnews
@@ -165,4 +176,4 @@ class Command(BaseCommand):
                     # Reddit API limited to 60 requests per minute
                     time.sleep(1)
 
-            self.stdout.write(f'[{timezone.now()}] Done!')
+            self.stdout.write(f"[{timezone.now()}] Done!")
