@@ -2,7 +2,10 @@ from django.db import models
 from model_utils.choices import Choices
 from model_utils.models import TimeStampedModel
 
-# Create your models here.
+
+class SubredditsToReadManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(disabled=False)
 
 
 class SubredditsToRead(TimeStampedModel):
@@ -12,6 +15,9 @@ class SubredditsToRead(TimeStampedModel):
     )
     post_limit = models.IntegerField()
     disabled = models.BooleanField(default=False)
+
+    objects = models.Manager()
+    get_active = SubredditsToReadManager()
 
     def __str__(self):
         ret_str = f"{self.subreddit_name} ({self.post_limit} posts)"

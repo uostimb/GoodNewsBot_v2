@@ -32,8 +32,7 @@ def clean_title(title):
         title
         .replace(u"\u2018", "'")
         .replace(u"\u2019", "'")
-        .encode("ascii", "replace")
+        .encode("ascii", "ignore")
+        .decode("utf8")
     )
-    newtitle = str(newtitle)
-    newtitle.strip("b").strip("'")
     return newtitle

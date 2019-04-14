@@ -29,10 +29,9 @@ class Command(BaseCommand):
     )
 
     def handle(self, **options):
-        to_read = SubredditsToRead.objects.all()
+        to_read = SubredditsToRead.get_active.all()
 
         to_read_list = to_read.values_list('subreddit_name', flat=True)
-
         to_read_list = nat_join(to_read_list)
 
         self.stdout.write(
