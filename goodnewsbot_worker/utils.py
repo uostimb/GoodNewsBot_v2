@@ -1,6 +1,6 @@
 def nat_join(value, cnj="and"):
     """
-    natural_join(['pierre', 'paul', 'jacques'])
+    nat_join(['pierre', 'paul', 'jacques'])
     returns 'pierre, paul and jacques'
     """
     if isinstance(value, list):

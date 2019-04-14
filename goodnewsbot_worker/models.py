@@ -31,8 +31,8 @@ class NewsPost(TimeStampedModel):
     Model to store news posts and associated sentiment analysis data
     """
     SUBREDDIT_POSTED_TO = Choices(
-        (0, 'justbadnews', 'JustBadNews'),
-        (1, 'justgoodnews', 'JustGoodNews'),
+        (0, "justbadnews", "JustBadNews"),
+        (1, "justgoodnews", "JustGoodNews"),
     )
 
     post_title = models.CharField(
@@ -43,7 +43,7 @@ class NewsPost(TimeStampedModel):
     )
     from_subreddit = models.ForeignKey(
         on_delete=models.DO_NOTHING,
-        to='goodnewsbot_worker.SubredditsToRead',
+        to="goodnewsbot_worker.SubredditsToRead",
         related_name="news_post",
     )
     analysed_sentiment = models.CharField(
