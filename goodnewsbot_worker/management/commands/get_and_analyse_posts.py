@@ -81,7 +81,7 @@ class Command(BaseCommand):
                                 f"url: {cleaned_url}, "
                                 f"title: {cleaned_title}, "
                                 f"from subredditt: {subreddit_to_read}, "
-                                f"error: {sys.exc_info()[0]}",
+                                f"error: {sys.exc_info()}",
                             )
 
             self.stdout.write(
