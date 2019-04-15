@@ -54,28 +54,32 @@ class Command(BaseCommand):
             subreddit = reddit.subreddit(subreddit_to_read.subreddit_name)
             for submission in subreddit.hot(limit=post_limit):
 
-                dirty_url = submission.url
-                cleaned_url = clean_url(dirty_url)
+                # ignore non-link posts
+                if not submission.is_self:
 
-                dirty_title = submission.title
-                cleaned_title = clean_title(dirty_title)
+                    dirty_url = submission.url
+                    cleaned_url = clean_url(dirty_url)
 
-                if not NewsPost.objects.filter(post_url=cleaned_url).exists():
-                    try:
-                        new_post = NewsPost.objects.create(
-                            post_url=cleaned_url,
-                            post_title=cleaned_title,
-                            from_subreddit=subreddit_to_read,
-                        )
-                        new_posts.append(new_post)
+                    dirty_title = submission.title
+                    cleaned_title = clean_title(dirty_title)
 
-                        subreddit_count += 1
-                    except:
-                        self.stdout.write(
-                            f"[{timezone.now()}] ERROR!  Cant write to DB: "
-                            f"url: {cleaned_url}, title: {cleaned_title}, "
-                            f"from subredditt {subreddit_to_read}",
-                        )
+                    if not NewsPost.objects.filter(post_url=cleaned_url).exists():
+                        try:
+                            new_post = NewsPost.objects.create(
+                                post_url=cleaned_url,
+                                post_title=cleaned_title,
+                                from_subreddit=subreddit_to_read,
+                                permalink=submission.permalink,
+                            )
+                            new_posts.append(new_post)
+
+                            subreddit_count += 1
+                        except:
+                            self.stdout.write(
+                                f"[{timezone.now()}] ERROR!  Cant write to DB: "
+                                f"url: {cleaned_url}, title: {cleaned_title}, "
+                                f"from subredditt {subreddit_to_read}",
+                            )
 
             self.stdout.write(
                 f"[{timezone.now()}] Found {subreddit_count} new posts in "
@@ -171,6 +175,9 @@ class Command(BaseCommand):
                     )
                     reddit_post.mod.flair(
                         text=f"Negativity={post.quantified_negative}",
+                    )
+                    reddit_post.reply(
+                        f"Original post: {post.permalink}",
                     )
 
                     # Reddit API limited to 60 requests per minute

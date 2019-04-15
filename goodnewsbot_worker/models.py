@@ -39,12 +39,15 @@ class NewsPost(TimeStampedModel):
         max_length=300,
     )
     post_url = models.CharField(
-        max_length=300,
+        max_length=2000,
     )
     from_subreddit = models.ForeignKey(
         on_delete=models.DO_NOTHING,
         to="goodnewsbot_worker.SubredditsToRead",
         related_name="news_post",
+    )
+    permalink = models.CharField(
+        max_length=64,
     )
     analysed_sentiment = models.CharField(
         null=True,
