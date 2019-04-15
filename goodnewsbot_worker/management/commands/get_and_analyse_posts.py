@@ -1,5 +1,6 @@
 import boto3
 import praw
+import sys
 import time
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -76,9 +77,11 @@ class Command(BaseCommand):
                             subreddit_count += 1
                         except:
                             self.stdout.write(
-                                f"[{timezone.now()}] ERROR!  Cant write to DB: "
-                                f"url: {cleaned_url}, title: {cleaned_title}, "
-                                f"from subredditt {subreddit_to_read}",
+                                f"[{timezone.now()}] ERROR! Cant write to DB! "
+                                f"url: {cleaned_url}, "
+                                f"title: {cleaned_title}, "
+                                f"from subredditt: {subreddit_to_read}, "
+                                f"error: {sys.exc_info()[0]}",
                             )
 
             self.stdout.write(
@@ -127,7 +130,8 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(
                         f"[{timezone.now()}] ERROR Analysing sentiment of "
-                        f"{post.post_title}"
+                        f"{post.post_title}! "
+                        f"response: {response}"
                     )
 
             if positive_posts:
@@ -150,6 +154,9 @@ class Command(BaseCommand):
                     )
                     reddit_post.mod.flair(
                         text=f"Positivity={post.quantified_positive}",
+                    )
+                    reddit_post.reply(
+                        f"Original post: {post.permalink}",
                     )
 
                     # Reddit API limited to 60 requests per minute
