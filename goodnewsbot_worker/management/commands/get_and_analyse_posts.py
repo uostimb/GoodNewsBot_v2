@@ -157,7 +157,7 @@ class Command(BaseCommand):
                     )
                     reddit_post.reply(
                         f"xpost from r/{post.from_subreddit.subreddit_name}. "
-                        f"(original post)[{post.permalink}]",
+                        f"[original post]({post.permalink})",
                     )
 
                     # Reddit API limited to 60 requests per minute
@@ -186,7 +186,7 @@ class Command(BaseCommand):
                     )
                     reddit_post.reply(
                         f"xpost from r/{post.from_subreddit.subreddit_name}. "
-                        f"(original post)[{post.permalink}]",
+                        f"[original post]({post.permalink})",
                     )
 
                     # Reddit API limited to 60 requests per minute
