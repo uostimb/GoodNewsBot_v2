@@ -47,7 +47,7 @@ class NewsPost(TimeStampedModel):
         related_name="news_post",
     )
     permalink = models.CharField(
-        max_length=64,
+        max_length=128,
     )
     analysed_sentiment = models.CharField(
         null=True,
