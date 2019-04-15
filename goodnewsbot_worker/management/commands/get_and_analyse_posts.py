@@ -12,21 +12,18 @@ from goodnewsbot_worker.utils import nat_join, clean_url, clean_title
 
 class Command(BaseCommand):
     """
-    To be invoked daily by cron similar to the following
+    To be invoked (hourly?) by cron similar to the following
     pseudo-command:
 
-        30 8 * * 1-5 \
+        0 * * * * \
             . bin/activate && \
-            cd empirical/empirical && \
+            cd dev/goodnewsbot && \
             bin/python empirical/empirical/manage.py \
-                reminder_overdue \
-                --settings=empirical.settings.production > \
-                empirical/empirical/logs/cron_reminder_overdue.log \
-                2>&1
+                get_and_analyse_posts \
+                >> dev/goodnewsbot/goodnewsbot.log 2>&1
     """
     help = (
-        "Sends a summary email detailing overdue"
-        " `InstructionReminder`s."
+        "Fetch and analyse posts from reddit, repost pos and neg stories"
     )
 
     def handle(self, **options):
