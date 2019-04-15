@@ -18,12 +18,11 @@ class Command(BaseCommand):
         0 * * * * \
             . bin/activate && \
             cd dev/goodnewsbot && \
-            bin/python empirical/empirical/manage.py \
-                get_and_analyse_posts \
+            bin/python dev/goodnewsbot/manage.py get_and_analyse_posts \
                 >> dev/goodnewsbot/goodnewsbot.log 2>&1
     """
     help = (
-        "Fetch and analyse posts from reddit, repost pos and neg stories"
+        "Fetch and analyse posts from reddit, repost +ve and -ve news stories"
     )
 
     def handle(self, **options):
@@ -60,6 +59,26 @@ class Command(BaseCommand):
 
                     dirty_title = submission.title
                     cleaned_title = clean_title(dirty_title)
+
+                    if len(cleaned_url) > NewsPost._meta.get_field('post_url').max_length:
+                        self.stdout.write(
+                            f"[{timezone.now()}] "
+                            f"ERROR! Cant write post to DB - URL too long! "
+                            f"url: {cleaned_url}, "
+                            f"title: {cleaned_title}, "
+                            f"from subredditt: {subreddit_to_read}"
+                        )
+                        continue
+
+                    elif len(cleaned_title) > NewsPost._meta.get_field('post_title').max_length:
+                        self.stdout.write(
+                            f"[{timezone.now()}] "
+                            f"ERROR! Cant write post to DB - Title too long! "
+                            f"url: {cleaned_url}, "
+                            f"title: {cleaned_title}, "
+                            f"from subredditt: {subreddit_to_read}"
+                        )
+                        continue
 
                     if not NewsPost.objects.filter(post_url=cleaned_url).exists():
                         try:
