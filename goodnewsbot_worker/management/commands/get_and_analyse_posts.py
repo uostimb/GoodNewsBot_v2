@@ -136,7 +136,7 @@ class Command(BaseCommand):
 
             if positive_posts:
                 self.stdout.write(
-                    f"[{timezone.now()}] Found {len(positive_posts)} "
+                    f"[{timezone.now()}] Posting {len(positive_posts)} "
                     f"Positive posts!",
                 )
                 for post in positive_posts:
@@ -156,7 +156,8 @@ class Command(BaseCommand):
                         text=f"Positivity={post.quantified_positive}",
                     )
                     reddit_post.reply(
-                        f"Original post: {post.permalink}",
+                        f"xpost from r/{post.from_subreddit.subreddit_name}. "
+                        f"(original post)[{post.permalink}]",
                     )
 
                     # Reddit API limited to 60 requests per minute
@@ -164,7 +165,7 @@ class Command(BaseCommand):
 
             if negative_posts:
                 self.stdout.write(
-                    f"[{timezone.now()}] Found {len(negative_posts)} "
+                    f"[{timezone.now()}] Posting {len(negative_posts)} "
                     f"Negative posts!",
                 )
                 for post in negative_posts:
@@ -184,7 +185,8 @@ class Command(BaseCommand):
                         text=f"Negativity={post.quantified_negative}",
                     )
                     reddit_post.reply(
-                        f"Original post: {post.permalink}",
+                        f"xpost from r/{post.from_subreddit.subreddit_name}. "
+                        f"(original post)[{post.permalink}]",
                     )
 
                     # Reddit API limited to 60 requests per minute
