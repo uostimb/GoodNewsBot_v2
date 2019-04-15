@@ -1,7 +1,7 @@
+import sys
+
 import boto3
 import praw
-import sys
-import time
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -160,9 +160,6 @@ class Command(BaseCommand):
                         f"[original post]({post.permalink})",
                     )
 
-                    # Reddit API limited to 60 requests per minute
-                    time.sleep(1)
-
             if negative_posts:
                 self.stdout.write(
                     f"[{timezone.now()}] Posting {len(negative_posts)} "
@@ -188,8 +185,5 @@ class Command(BaseCommand):
                         f"xpost from r/{post.from_subreddit.subreddit_name}. "
                         f"[original post]({post.permalink})",
                     )
-
-                    # Reddit API limited to 60 requests per minute
-                    time.sleep(1)
 
             self.stdout.write(f"[{timezone.now()}] Done!")
