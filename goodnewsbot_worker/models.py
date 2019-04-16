@@ -49,10 +49,11 @@ class NewsPost(TimeStampedModel):
     permalink = models.CharField(
         max_length=128,
     )
-    analysed_sentiment = models.CharField(
+    analysed_sentiment2 = models.ForeignKey(
+        to="goodnewsbot_worker.Sentiment",
+        on_delete=models.DO_NOTHING,
+        related_name="news_post",
         null=True,
-        blank=True,
-        max_length=8,
     )
     quantified_positive = models.DecimalField(
         null=True,
@@ -86,3 +87,21 @@ class NewsPost(TimeStampedModel):
 
     def __str__(self):
         return f"{self.post_title} - {self.analysed_sentiment}"
+
+
+class Sentiment(models.Model):
+    """
+    Holds possible Sentiments and the cut off value above which we have
+    confidence in the analysed sentment
+    """
+    sentiment = models.CharField(
+        max_length=10,
+        unique=True,
+    )
+    cutoff = models.DecimalField(
+        max_digits=6,
+        decimal_places=5,
+    )
+
+    def __str__(self):
+        return f"{self.sentiment} (>{self.cutoff})"

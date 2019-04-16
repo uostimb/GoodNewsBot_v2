@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from goodnewsbot_worker.models import SubredditsToRead, NewsPost
+from goodnewsbot_worker.models import SubredditsToRead, NewsPost, Sentiment
 from goodnewsbot_worker.utils import nat_join, clean_url, clean_title
 
 
@@ -130,17 +130,21 @@ class Command(BaseCommand):
                 response_metadata = response.get("ResponseMetadata")
                 if response_metadata.get("HTTPStatusCode") == 200:
 
+                    sentiment = Sentiment.objects.get(sentiment=response.get("Sentiment"))
+                    post.analysed_sentiment2 = sentiment
                     sentiment_score = response.get("SentimentScore")
-                    post.analysed_sentiment = response.get("Sentiment")
                     post.quantified_positive = sentiment_score.get("Positive")
                     post.quantified_negative = sentiment_score.get("Negative")
                     post.quantified_neutral = sentiment_score.get("Neutral")
                     post.quantified_mixed = sentiment_score.get("Mixed")
                     post.save()
 
-                    if sentiment_score.get("Positive") > 0.7:
+                    positive_cutoff = Sentiment.objects.get(sentiment="POSITIVE").cutoff
+                    negative_cutoff = Sentiment.objects.get(sentiment="NEGATIVE").cutoff
+
+                    if sentiment_score.get("Positive") > positive_cutoff:
                         positive_posts.append(post)
-                    elif sentiment_score.get("Negative") > 0.7:
+                    elif sentiment_score.get("Negative") > negative_cutoff:
                         negative_posts.append(post)
 
                 else:
