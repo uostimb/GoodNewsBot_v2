@@ -45,7 +45,11 @@ class SubredditsToRead(TimeStampedModel):
         reddit = praw.Reddit()
         subreddit = reddit.subreddit(subreddit_name)
 
-        for submission in subreddit.hot(limit=post_limit):
+        existing_urls = set(
+            SentimentAnalysis.objects.values_list("news_story_url", flat=True)
+        )
+
+        for submission in subreddit.rising(limit=post_limit):
 
             # ignore non-link posts
             if not submission.is_self:
@@ -64,13 +68,7 @@ class SubredditsToRead(TimeStampedModel):
                     # can't store post: let method print error and skip to next
                     continue
 
-                new_story = not (
-                    SentimentAnalysis.objects
-                    .filter(news_story_url=cleaned_url)
-                    .exists()
-                )
-
-                if new_story:
+                if cleaned_url not in existing_urls:
                     try:
                         RedditPost.objects.create(
                             news_story_url=cleaned_url,
@@ -78,6 +76,7 @@ class SubredditsToRead(TimeStampedModel):
                             from_subreddit=self,
                             their_post_permalink=submission.permalink,
                         )
+                        existing_urls.add(cleaned_url)
                         new_posts_count += 1
 
                     except Exception as e:
@@ -136,6 +135,7 @@ class Sentiment(models.Model):
     )
     subreddit_to_post_to = models.ForeignKey(
         null=True,
+        blank=True,
         to="goodnewsbot_worker.SubredditsToPostTo",
         on_delete=models.SET_NULL,
         related_name="sentiment",
