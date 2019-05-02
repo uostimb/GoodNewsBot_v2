@@ -24,8 +24,7 @@ def get_env_var(setting, optional=False):
     else:
         # Setting not found in any of the places we looked
         msg = "'{}' setting not found! ".format(setting)
-        msg += "Either add it to empirical/empirical/settings/dev_overrides.py "
-        msg += "or set it as an OS environment variable"
+        msg += "Set it as an OS environment variable"
         raise NameError(msg)
 
 
@@ -40,7 +39,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '754dtluh%p11f@m0jik7yzjwhdnh!(rm_j1&c$8iotrl8^cy5_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_env_var("DJANGO_DEBUG", optional=True) or True
+DEBUG = get_env_var("DJANGO_DEBUG")
 
 ALLOWED_HOSTS = ['167.99.85.139', 'goodnews.timboss.com']
 
