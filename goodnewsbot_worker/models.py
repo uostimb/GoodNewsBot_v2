@@ -2,6 +2,7 @@ import sys
 
 import boto3
 import praw
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
@@ -40,7 +41,7 @@ class SubredditsToRead(TimeStampedModel):
             f"[{timezone.now()}] Fetching {post_limit} posts from "
             f"{subreddit_name}.",
         )
-        new_posts = []
+        new_posts_count = 0
         reddit = praw.Reddit()
         subreddit = reddit.subreddit(subreddit_name)
 
@@ -71,13 +72,13 @@ class SubredditsToRead(TimeStampedModel):
 
                 if new_story:
                     try:
-                        new_post = RedditPost.objects.create(
+                        RedditPost.objects.create(
                             news_story_url=cleaned_url,
                             post_title=cleaned_title,
                             from_subreddit=self,
                             their_post_permalink=submission.permalink,
                         )
-                        new_posts.append(new_post)
+                        new_posts_count += 1
 
                     except Exception as e:
                         print(
@@ -88,7 +89,7 @@ class SubredditsToRead(TimeStampedModel):
                             f"error: {e} {sys.exc_info()}",
                         )
 
-        return new_posts
+        return new_posts_count
 
 
 class RSSToRead(TimeStampedModel):
@@ -247,17 +248,24 @@ class RedditPostManager(models.Manager):
         else:
             return True
 
-    @staticmethod
-    def get_new_posts():
+    def get_new_posts(self):
         subreddits_to_read = SubredditsToRead.objects.active()
         for subreddit in subreddits_to_read:
             new_posts = subreddit.get_new_posts()
             print(
-                f"[{timezone.now()}] Found {len(new_posts)} new posts in "
+                f"[{timezone.now()}] Found {new_posts} new posts in "
                 f"{subreddit.subreddit_name}.",
             )
-            for post in new_posts:
-                post.analyse_sentiment_and_repost()
+            self.model.objects.analyse_new_posts()
+
+    def analyse_new_posts(self):
+        new_posts = (
+            super()
+            .get_queryset()
+            .filter(analysed_sentiment2__isnull=True)
+        )
+        for post in new_posts:
+            post.analyse_sentiment_and_repost()
 
 
 class RedditPost(SentimentAnalysis):
@@ -311,6 +319,7 @@ class RedditPost(SentimentAnalysis):
             )
 
             if sentiment_obj:
+                sentiment_obj = sentiment_obj.get()
                 quantification = getattr(
                     self,
                     f"quantified_{sentiment_response.lower()}"
@@ -330,21 +339,25 @@ class RedditPost(SentimentAnalysis):
         else:
             print(
                 f"[{timezone.now()}] "
-                f"ERROR! Cannot handle Reddit Post Sentiment Type! "
-                f"Sentiment: {sentiment}, "
-                f"post title: {self.post_title}, "
+                f"ERROR! Cannot handle Reddit Post Sentiment Type {sentiment}!"
+                f" Post title: {self.post_title}, "
                 f"from subredditt: {self.from_subreddit.subreddit_name}"
             )
             return
 
+        if settings.DEBUG:
+            subreddit = settings.TESTING_SUBREDDIT
+        else:
+            subreddit = sentiment.subreddit_to_post_to.subreddit_name
+
         print(
             f'[{timezone.now()}] Posting {adjective_str} post: '
-            f'"{self.post_title}" to {sentiment.subreddit_to_post_to}'
+            f'"{self.post_title}" to {subreddit}'
         )
         reddit = praw.Reddit()
         reddit_post = (
             reddit
-            .subreddit(sentiment.subreddit_to_post_to.subreddit_name)
+            .subreddit(subreddit)
             .submit(
                 title=self.post_title,
                 url=self.news_story_url,

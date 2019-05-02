@@ -40,7 +40,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '754dtluh%p11f@m0jik7yzjwhdnh!(rm_j1&c$8iotrl8^cy5_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_env_var("DJANGO_DEBUG", optional=True) or True
 
 ALLOWED_HOSTS = ['167.99.85.139', 'goodnews.timboss.com']
 
@@ -149,3 +149,6 @@ DATE_INPUT_FORMATS = ["%Y-%m-%d", "%d/%m/%Y"]
 # Having intermittent problems with uploaded file permissions, trying this to standardise
 # NGINX runs as user "www-data" but Empirical runs as user "mischa" so need "all" to have at least "Read" for now
 FILE_UPLOAD_PERMISSIONS = 0o644
+
+
+TESTING_SUBREDDIT = "JustGoodTesting"
