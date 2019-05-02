@@ -40,6 +40,8 @@ SECRET_KEY = get_env_var("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_env_var("DJANGO_DEBUG")
+if DEBUG in ["False", 0]:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['167.99.85.139', 'goodnews.timboss.com']
 
