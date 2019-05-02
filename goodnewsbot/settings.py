@@ -43,7 +43,7 @@ DEBUG = get_env_var("DJANGO_DEBUG")
 if DEBUG in ["False", 0]:
     DEBUG = False
 
-ALLOWED_HOSTS = ['167.99.85.139', 'goodnews.timboss.com']
+ALLOWED_HOSTS = ['167.99.85.139', 'goodnewsbot.timboss.com']
 
 
 # Application definition
@@ -153,3 +153,5 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 
 
 TESTING_SUBREDDIT = "JustGoodTesting"
+
+ADMINS = [("Tim", "goodnewsbot_server@timboss.com")]
