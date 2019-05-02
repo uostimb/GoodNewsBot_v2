@@ -364,11 +364,11 @@ class RedditPost(SentimentAnalysis):
             )
         )
         reddit_post.mod.flair(
-            text=f"{past_tense_str}={quantification}",
+            text=f"{past_tense_str}={quantification}"
         )
         reddit_post.reply(
             f"xpost from r/{self.from_subreddit.subreddit_name}. "
-            f"[original post]({self.their_post_permalink})",
+            f"[original post]({self.their_post_permalink})"
         )
         self.subreddit_posted_to = sentiment.subreddit_to_post_to
         self.our_post_permalink = reddit_post.permalink
