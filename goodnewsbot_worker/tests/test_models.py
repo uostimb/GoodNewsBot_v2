@@ -1,7 +1,12 @@
 from django.test import TestCase
 from model_mommy import mommy
 
-from goodnewsbot_worker.models import RedditPost, SubredditsToRead, Sentiment
+from goodnewsbot_worker.models import (
+    RedditPost,
+    RSSToRead,
+    SubredditsToRead,
+    Sentiment,
+)
 
 
 class TestModels(TestCase):
@@ -59,6 +64,56 @@ class TestModels(TestCase):
                 "subreddit!"
             ),
         )
+
+    def test_rsstoread_model(self):
+        model_obj = mommy.make(
+            "goodnewsbot_worker.RSSToRead",
+            url="http://feeds.bbci.co.uk/news/rss.xml"
+        )
+
+        self.assertEqual(
+            model_obj.__str__(),
+            model_obj.url,
+        )
+
+        self.assertEqual(
+            model_obj.title,
+            "BBC News - Home",
+        )
+
+        self.assertEqual(
+            model_obj.description,
+            "BBC News - Home",
+        )
+
+        self.assertIn(
+            model_obj.pk,
+            RSSToRead.objects.active().values_list("pk", flat=True),
+        )
+
+        model_obj.disabled = True
+        model_obj.save()
+
+        self.assertEqual(
+            model_obj.__str__(),
+            f"{model_obj.url} [DISABLED]",
+        )
+
+        self.assertNotIn(
+            model_obj.pk,
+            SubredditsToRead.objects.active().values_list("pk", flat=True),
+        )
+
+        # num_new_posts = model_obj.get_new_stories()
+
+        # self.assertGreater(
+        #     num_new_posts,
+        #     1,
+        #     msg=(
+        #         f"Did not get any stories with 'new' urls from "
+        #         f"{model_obj.url}"
+        #     )
+        # )
 
     def test_subredditstopostto_model(self):
         self.assertEqual(

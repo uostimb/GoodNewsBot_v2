@@ -1,3 +1,4 @@
+import feedparser
 import sys
 
 import boto3
@@ -103,15 +104,28 @@ class RSSToRead(TimeStampedModel):
     Model to store RSS sources to fetch news posts from
     """
     url = models.URLField()
+    title = models.CharField(max_length=256, editable=False)
+    description = models.CharField(max_length=1024, null=True, editable=False)
     disabled = models.BooleanField(default=False)
 
     objects = SourceToReadManager()
 
     def __str__(self):
-        ret = {self.url}
+        ret = self.url
         if self.disabled:
             ret += " [DISABLED]"
         return ret
+
+    def save(self, *args, **kwargs):
+        """If new RSS entry attempt to parse RSS to get feed title and desc"""
+        if not self.pk:
+            feed = feedparser.parse(self.url)
+            self.title = feed.feed.title
+            self.description = feed.feed.description
+        super().save(*args, **kwargs)
+
+    def get_new_stories(self):
+        pass
 
 
 class SubredditsToPostTo(models.Model):
