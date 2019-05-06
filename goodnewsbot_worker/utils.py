@@ -24,7 +24,11 @@ def clean_url(url):
         .replace(u" ", "")
         .replace(u"\n", "")
     )
-    return str(newurl)
+    newurl = str(newurl)
+    if "?feedType=RSS" in newurl:  # reuters URLs from their RSS feeds
+        index = newurl.index("?feedType=RSS")
+        newurl = newurl[:index]
+    return newurl
 
 
 def clean_title(title):
@@ -36,3 +40,16 @@ def clean_title(title):
         .decode("utf8")
     )
     return newtitle
+
+
+def clean_description(description):
+    """
+    Reuters RSS feeds have some duff HTML in their item.description fields
+    after the legitimate description.
+    ToDo: This works fine for BBC and Reuters RSS feeds, will need to check
+      any others!
+    """
+    if "<div class=" in description:
+        index = description.index("<div class=")
+        description = description[:index]
+    return description

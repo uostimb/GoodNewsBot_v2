@@ -68,12 +68,14 @@ class TestModels(TestCase):
     def test_rsstoread_model(self):
         model_obj = mommy.make(
             "goodnewsbot_worker.RSSToRead",
+            # I should really host my own rss feed with known values instead
+            # of tests failing if the BBC ever update this!
             url="http://feeds.bbci.co.uk/news/rss.xml"
         )
 
         self.assertEqual(
             model_obj.__str__(),
-            model_obj.url,
+            f"{model_obj.title} - {model_obj.url}",
         )
 
         self.assertEqual(
@@ -96,7 +98,7 @@ class TestModels(TestCase):
 
         self.assertEqual(
             model_obj.__str__(),
-            f"{model_obj.url} [DISABLED]",
+            f"{model_obj.title} - {model_obj.url} [DISABLED]",
         )
 
         self.assertNotIn(
@@ -104,16 +106,13 @@ class TestModels(TestCase):
             SubredditsToRead.objects.active().values_list("pk", flat=True),
         )
 
-        # num_new_posts = model_obj.get_new_stories()
+        num_new_posts = model_obj.get_new_stories()
 
-        # self.assertGreater(
-        #     num_new_posts,
-        #     1,
-        #     msg=(
-        #         f"Did not get any stories with 'new' urls from "
-        #         f"{model_obj.url}"
-        #     )
-        # )
+        self.assertGreater(
+            num_new_posts,
+            1,
+            msg=f"Did not get any new news story urls from RSS {model_obj}",
+        )
 
     def test_subredditstopostto_model(self):
         self.assertEqual(
@@ -151,11 +150,13 @@ class TestModels(TestCase):
         pos_post_object = mommy.make(
             "goodnewsbot_worker.RedditPost",
             post_title=positive_post_title,
+            title_as_posted=positive_post_title,
         )
 
         neg_post_object = mommy.make(
             "goodnewsbot_worker.RedditPost",
             post_title=negative_post_title,
+            title_as_posted=negative_post_title,
         )
 
         self.assertEqual(

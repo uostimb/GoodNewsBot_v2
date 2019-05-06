@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from goodnewsbot_worker.models import RedditPost
+from goodnewsbot_worker.models import RedditPost, RSSPost
 
 
 class Command(BaseCommand):
@@ -21,4 +21,5 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         RedditPost.objects.get_new_posts()
+        RSSPost.objects.get_new_posts()
         self.stdout.write(f"[{timezone.now()}] Done!")
