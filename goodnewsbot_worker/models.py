@@ -49,7 +49,14 @@ class SubredditsToRead(TimeStampedModel):
             SentimentAnalysis.objects.values_list("news_story_url", flat=True)
         )
 
-        for submission in subreddit.rising(limit=post_limit):
+        submissions = set()
+        # we probably care about 'rising' posts [breaking news] more than
+        # 'hot' posts, but if the subreddit doesn't have much activity or
+        # traffic then 'rising' could be empty
+        submissions.update(subreddit.rising(limit=post_limit))
+        submissions.update(subreddit.hot(limit=post_limit))
+
+        for submission in submissions:
 
             # ignore non-link posts
             if not submission.is_self:
@@ -222,8 +229,8 @@ class RSSPost(SentimentAnalysis):
 
 class RedditPostManager(models.Manager):
     def post_values_ok(self, url, title, subreddit_name):
-        max_url_len = self.model._meta.get_field('news_story_url').max_length
-        max_title_len = self.model._meta.get_field('post_title').max_length
+        max_url_len = self.model._meta.get_field("news_story_url").max_length
+        max_title_len = self.model._meta.get_field("post_title").max_length
 
         if len(url) > max_url_len:
             print(

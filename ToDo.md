@@ -1,3 +1,6 @@
+## General:
+- Use logging instead of calls to print()
+
 ## Cut out the middle man
 - Start parsing news websites directly (using beautiful soup?)
 - Summarise page contents use NLTK (https://stackabuse.com/text-summarization-with-nltk-in-python/)
