@@ -108,13 +108,19 @@ DATABASES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'INFO',
+            'filters': ['require_debug_false'],
             'class': 'logging.FileHandler',
             'filename': os.path.normpath(
                 os.path.join(BASE_DIR, 'logs/django_debug.log')
-            ),  # noqa: F405
+            ),
         },
         'console': {
             'level': 'INFO',
@@ -128,7 +134,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'mail_admins'],
+            'handlers': ['file', 'console', 'mail_admins'],
             'level': 'INFO',
             'propagate': True,
         },

@@ -6,7 +6,7 @@ from goodnewsbot_worker import models
 class SubredditsToReadAdmin(admin.ModelAdmin):
     list_display = ("subreddit_name", "post_limit", "disabled")
     list_filter = ["subreddit_name", "disabled"]
-    search_fields = ["subreddit_name", "disabled"]
+    search_fields = ["subreddit_name"]
 
 
 admin.site.register(models.SubredditsToRead, SubredditsToReadAdmin)
@@ -33,7 +33,7 @@ admin.site.register(models.SubredditsToPostTo, SubredditsToPostToAdmin)
 class SentimentAdmin(admin.ModelAdmin):
     list_display = ("sentiment", "cutoff", "subreddit_to_post_to")
     list_filter = ["sentiment", "cutoff", "subreddit_to_post_to"]
-    search_fields = ["sentiment", "cutoff", "subreddit_to_post_to"]
+    search_fields = ["sentiment", "cutoff", "subreddit_to_post_to__subreddit_name"]
 
 
 admin.site.register(models.Sentiment, SentimentAdmin)
@@ -54,9 +54,9 @@ class RSSPostAdmin(admin.ModelAdmin):
     ]
     search_fields = [
         "title_as_posted",
-        "from_rss_feed",
-        "analysed_sentiment2",
-        "subreddit_posted_to",
+        "from_rss_feed__url",
+        "analysed_sentiment2__sentiment",
+        "subreddit_posted_to__subreddit_name",
         "story_body"
     ]
 
@@ -79,10 +79,9 @@ class RedditPostAdmin(admin.ModelAdmin):
     ]
     search_fields = [
         "title_as_posted",
-        "from_subreddit",
-        "analysed_sentiment2",
-        "subreddit_posted_to",
-        "story_body"
+        "from_subreddit__subreddit_name",
+        "analysed_sentiment2__sentiment",
+        "subreddit_posted_to__subreddit_name",
     ]
 
 
