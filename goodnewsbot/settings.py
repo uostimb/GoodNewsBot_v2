@@ -43,7 +43,7 @@ DEBUG = get_env_var("DJANGO_DEBUG")
 if DEBUG in ["False", 0]:
     DEBUG = False
 
-ALLOWED_HOSTS = ['167.99.85.139', 'goodnewsbot.timboss.com', 'localhost']
+ALLOWED_HOSTS = ['167.99.85.139', '*.timboss.com', 'localhost']
 
 
 # Application definition
