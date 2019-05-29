@@ -19,5 +19,6 @@ from django.urls import path
 
 urlpatterns = [
     path('adminrealm/', admin.site.urls),
+    path('', include('root.urls')),
     path('', include('goodnewsbot_worker.urls')),
 ]

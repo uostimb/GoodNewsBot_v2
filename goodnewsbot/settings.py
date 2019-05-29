@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'goodnewsbot_worker',
+    'root',
 ]
 
 MIDDLEWARE = [
