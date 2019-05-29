@@ -180,13 +180,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'goodnewsbot_worker/static')
 
 
 DATE_INPUT_FORMATS = ["%Y-%m-%d", "%d/%m/%Y"]
 
-# Having intermittent problems with uploaded file permissions, trying this to standardise
-# NGINX runs as user "www-data" but Empirical runs as user "mischa" so need "all" to have at least "Read" for now
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 
