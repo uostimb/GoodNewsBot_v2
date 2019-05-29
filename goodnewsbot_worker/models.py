@@ -537,7 +537,6 @@ class RedditPostManager(models.Manager):
                 f"from subredditt: {subreddit_name}"
             )
             return False
-
         elif len(title) > max_title_len:
             print(
                 f"[{timezone.now()}] "
@@ -547,7 +546,15 @@ class RedditPostManager(models.Manager):
                 f"from subredditt: {subreddit_name}"
             )
             return False
-
+        elif len(title) == 0:
+            print(
+                f"[{timezone.now()}] "
+                f"ERROR! Post has no title! "
+                f"url: {url}, "
+                f"title: {title}, "
+                f"from subredditt: {subreddit_name}"
+            )
+            return False
         else:
             return True
 
