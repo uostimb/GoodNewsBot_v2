@@ -13,9 +13,7 @@
         }
 
         body {
-            font-size: 75%;
             background: #222;
-            font-family: sans, arial;
             padding: 20px 0 0 20px
         }
 
@@ -39,7 +37,7 @@
         mtn, trackmouse = false;
 
     window.onload = function () {
-        canvas = document.createElement('canvas')
+        canvas = document.createElement('canvas');
         w = canvas.width = window.innerWidth - 40;
         h = canvas.height = window.innerHeight - 40;
         c = canvas.getContext('2d');
@@ -59,10 +57,10 @@
         mX = w / 2;
         mY = w / 2;
 
-        per = {x: w / 2, y: h / 2, step: 1}
+        per = {x: w / 2, y: h / 2, step: 1};
         mtn = new Mountains(300, "10");
         window.setInterval(animate, 17);
-    }
+    };
 
     function newGradient(gradient) {
         var grad;
@@ -126,7 +124,6 @@
         };
         this.draw = function () {
             c.save();
-            //c.fillStyle = "rgba(20,20,20,1)";
             c.fillStyle = newGradient({
                 type: "linear",
                 x1: 0,
