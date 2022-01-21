@@ -4,7 +4,7 @@ django-extensions==2.1.6
 django-model-utils==3.1.2
 feedparser==5.2.1
 gunicorn==19.9.0
-ipython==7.4.0
+ipython==7.16.3
 model-mommy==1.6.0
 pipdeptree
 praw==6.1.1
